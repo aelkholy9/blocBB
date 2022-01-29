@@ -14,10 +14,18 @@ dependencies:
 
   cupertino_icons: ^1.0.2
 
+  #web services
+  dio: ^4.0.4
+  flutter_offline: ^2.0.0
+
+  #state management
+  flutter_bloc: ^8.0.1
+  equatable: ^2.0.3
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
 
   flutter_lints: ^1.0.0
 
