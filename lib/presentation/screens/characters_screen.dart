@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_final_fields
+
 import 'package:bloc_breaking_bad/buisness_logic/cubit/characters_cubit.dart';
 import 'package:bloc_breaking_bad/constants/app_colors.dart';
 import 'package:bloc_breaking_bad/data/models/Character.dart';
@@ -14,6 +16,81 @@ class CharactersScreen extends StatefulWidget {
 
 class _CharactersScreenState extends State<CharactersScreen> {
   late List<Character> allCharacters;
+  List<Character> searchedCharacters = [];
+  bool _isSearching = false;
+  final _searchTextController = TextEditingController();
+
+  Widget buildSearchField() {
+    return TextField(
+      controller: _searchTextController,
+      cursorColor: AppColors.textColor,
+      decoration: const InputDecoration(
+        hintText: "Enter a keyword",
+        hintStyle: TextStyle(
+          color: Colors.white,
+        ),
+        border: null,
+      ),
+      style: const TextStyle(color: AppColors.textColor),
+      onChanged: (searchKeyWord) {
+        addSearchResultsToSearchedCharactersList(searchKeyWord);
+      },
+    );
+  }
+
+  void addSearchResultsToSearchedCharactersList(String searchKeyWord) {
+    searchedCharacters = allCharacters
+        .where((character) => character.name!.contains(searchKeyWord))
+        .toList();
+    setState(() {});
+  }
+
+  List<Widget> _buildAppBarActions() {
+    if (_isSearching) {
+      return [
+        IconButton(
+          onPressed: () {
+            _clearSearchField();
+            Navigator.of(context).pop();
+          },
+          icon: const Icon(Icons.clear),
+        ),
+      ];
+    } else {
+      return [
+        IconButton(
+          onPressed: () {
+            _startSearching();
+          },
+          icon: const Icon(Icons.search),
+        )
+      ];
+    }
+  }
+
+  void _startSearching() {
+    ModalRoute.of(context)!.addLocalHistoryEntry(LocalHistoryEntry(
+      onRemove: () {
+        _stopSearching();
+      },
+    ));
+    setState(() {
+      _isSearching = true;
+    });
+  }
+
+  void _stopSearching() {
+    _clearSearchField();
+    setState(() {
+      _isSearching = false;
+    });
+  }
+
+  void _clearSearchField() {
+    setState(() {
+      _searchTextController.clear();
+    });
+  }
 
   @override
   void initState() {
@@ -56,10 +133,14 @@ class _CharactersScreenState extends State<CharactersScreen> {
         ),
         itemBuilder: (context, index) {
           return CharacterItem(
-            character: allCharacters[index],
+            character: _searchTextController.text.isEmpty
+                ? allCharacters[index]
+                : searchedCharacters[index],
           );
         },
-        itemCount: allCharacters.length,
+        itemCount: _searchTextController.text.isEmpty
+            ? allCharacters.length
+            : searchedCharacters.length,
       ),
     );
   }
@@ -75,12 +156,15 @@ class _CharactersScreenState extends State<CharactersScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.mainColor,
-        title: const Text(
-          'Characters',
-          style: TextStyle(
-            color: AppColors.textColor,
-          ),
-        ),
+        title: _isSearching
+            ? buildSearchField()
+            : const Text(
+                'Characters',
+                style: TextStyle(
+                  color: AppColors.textColor,
+                ),
+              ),
+        actions: _buildAppBarActions(),
       ),
       body: buildBlocWidget(),
     );
