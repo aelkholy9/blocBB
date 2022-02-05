@@ -18,8 +18,7 @@ class _CharactersScreenState extends State<CharactersScreen> {
   @override
   void initState() {
     super.initState();
-    allCharacters =
-        BlocProvider.of<CharactersCubit>(context).getAllCharacters();
+    BlocProvider.of<CharactersCubit>(context).getAllCharacters();
   }
 
   Widget buildBlocWidget() {
@@ -29,33 +28,45 @@ class _CharactersScreenState extends State<CharactersScreen> {
           allCharacters = state.characters;
           return buildCharactersListWidget();
         }
-        return buildErrorWidget();
+        return buildLoadingWidget();
       },
     );
   }
 
   Widget buildCharactersListWidget() {
     return SingleChildScrollView(
-      child: Container(
-        child: Column(
-          children: [buildCharactersGrid()],
-        ),
+      child: Column(
+        children: [
+          buildCharactersGrid(),
+        ],
       ),
     );
   }
 
   Widget buildCharactersGrid() {
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+    return Container(
+      width: double.infinity,
+      height: MediaQuery.of(context).size.height,
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           childAspectRatio: 2 / 3,
           crossAxisSpacing: 1,
-          mainAxisSpacing: 1),
-      itemBuilder: (context, index) {
-        return CharacterItem(
-          character: Character(),
-        );
-      },
+          mainAxisSpacing: 1,
+        ),
+        itemBuilder: (context, index) {
+          return CharacterItem(
+            character: allCharacters[index],
+          );
+        },
+        itemCount: allCharacters.length,
+      ),
+    );
+  }
+
+  Widget buildLoadingWidget() {
+    return Center(
+      child: Image.asset('assets/images/loading.gif'),
     );
   }
 
@@ -66,7 +77,9 @@ class _CharactersScreenState extends State<CharactersScreen> {
         backgroundColor: AppColors.mainColor,
         title: const Text(
           'Characters',
-          style: TextStyle(color: AppColors.textColor),
+          style: TextStyle(
+            color: AppColors.textColor,
+          ),
         ),
       ),
       body: buildBlocWidget(),
