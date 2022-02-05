@@ -1,10 +1,11 @@
 part of 'characters_cubit.dart';
 
-abstract class CharactersState extends Equatable {
-  const CharactersState();
-}
+@immutable
+abstract class CharactersState {}
 
-class CharactersInitial extends CharactersState {
-  @override
-  List<Object> get props => [];
+class CharactersInitial extends CharactersState {}
+
+class CharactersLoaded extends CharactersState {
+  final List<Character> characters;
+  CharactersLoaded(this.characters);
 }
