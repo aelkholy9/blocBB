@@ -1,6 +1,6 @@
 # bloc_breaking_bad
 
-bloc architecture applied on a basic app fetching data from a free API
+bloc state management applied on a basic app fetching data from a free API
 
 ## Getting Started
 
